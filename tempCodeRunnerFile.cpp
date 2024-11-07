@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <cstdlib>
 #include <ctime>
 #include <string>
@@ -77,6 +76,7 @@ struct PlayerInfo {
         delete rightChild;
     }
 };
+
 class PlayerTree {
   public:
     PlayerInfo *root;
@@ -85,49 +85,10 @@ class PlayerTree {
         this->root = nullptr;
     }
 
+  
+
     void insertPlayer(PlayerInfo *newPlayer) {
         this->root = insertPlayerR(this->root, newPlayer);
-    }
-
-    void loadPlayersFromFile(const string &fileName) {
-        ifstream inFile(fileName);
-        if (!inFile.is_open()) {
-            cerr << "Error opening file: " << fileName << endl;
-            return;
-        }
-
-        string line;
-        while (getline(inFile, line)) {
-            stringstream ss(line);
-            string playerID, fullName, phone, email, password;
-            getline(ss, playerID, ',');
-            getline(ss, fullName, ',');
-            getline(ss, phone, ',');
-            getline(ss, email, ',');
-            getline(ss, password);
-
-            PlayerInfo *player = new PlayerInfo(playerID, fullName, phone, email, password);
-
-            // Insert the player into the tree
-            insertPlayer(player);
-
-            // Load games for this player (following lines)
-            while (getline(inFile, line) && !line.empty()) {
-                stringstream gameSS(line);
-                string gameID;
-                float hoursPlayed;
-                int achievementsUnlocked;
-                gameSS >> gameID >> hoursPlayed >> achievementsUnlocked;
-
-                // Create GameDetails object and link it to the player
-                GameDetails *game = new GameDetails(gameID, hoursPlayed, achievementsUnlocked);
-                game->leftChild = player->gamesPlayed;
-                player->gamesPlayed = game;
-            }
-        }
-
-        inFile.close();
-        cout << "Players loaded from " << fileName << endl;
     }
 
     void savePlayers(const string &fileName) {
@@ -149,11 +110,14 @@ class PlayerTree {
         return searchPlayerR(this->root, playerID);
     }
 
+   
     ~PlayerTree() {
-        delete root;
+        delete root;  
     }
 
   private:
+
+
     void savePlayersR(PlayerInfo *node, ofstream &outFile) {
         if (node != nullptr) {
             outFile << node->playerID << "," 
@@ -189,13 +153,15 @@ class PlayerTree {
     void displayGamesR(GameDetails *gameNode) {
         if (gameNode == nullptr) {
             cout << "  No games played." << endl;
-            return;
+            return;  // Properly return when no games are present.
         }
 
+       
         cout << "  Game ID: " << gameNode->gameID
              << ", Hours Played: " << gameNode->hoursPlayed
              << ", Achievements: " << gameNode->achievementsUnlocked << endl;
 
+      
         if (gameNode->leftChild != nullptr || gameNode->rightChild != nullptr) {
             displayGamesR(gameNode->leftChild);
             displayGamesR(gameNode->rightChild);
@@ -245,9 +211,7 @@ int main() {
     srand(time(0));  
 
     PlayerTree playerTree;
-    
-    playerTree.loadPlayersFromFile("Players.csv");
-    
+
     PlayerInfo *player1 = new PlayerInfo("123", "Ali", "9876543210", "ali@email.com", "passwordlesgo123");
     PlayerInfo *player2 = new PlayerInfo("456", "Babar", "12345678910", "bobzitheking@email.com", "passwordlesgo456");
 
